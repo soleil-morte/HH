@@ -11,7 +11,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=13, unique=True, null=True, blank=True, validators=[phone_regex])
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=120)
-    profile_picture = models.ImageField(upload_to='media/')
+    profile_picture = models.ImageField(upload_to='', blank=True, null=True)
     cv = models.FileField(upload_to='cvs/', blank=True, null=True)
     is_employer = models.BooleanField(default=False)
 

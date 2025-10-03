@@ -1,7 +1,6 @@
 from django.urls import path, include
 from .views import *
 from django.contrib import admin
-
 from django.contrib.auth.views import LoginView
 
 urlpatterns = [
@@ -12,5 +11,6 @@ urlpatterns = [
     path('profile/', profile_view, name='profile'),
     path('profile/update/', profile_update, name='profile_update'),
     path('auth/', include('allauth.urls')), 
-    path('accounts/', include("allauth.urls"))
+    path('accounts/', include("allauth.urls")),
+    path('api/auth/password/change/', PasswordChangeView.as_view(), name='password_change'),
 ]

@@ -37,14 +37,15 @@
         <p><b>Telefon:</b> {{ user.phone }}</p>
         <p><b>Rezyume :</b>
             {% if user.cv %}
-            <a href="{{ user.cv.url }}">📄 CV-ni yuklab olish</a>
+            <a href="{{ user.cv.url }}" target="_blank">📄 CV-ni korib olish</a>
+            <a href="{{ user.cv.url }}" download="">📄 CV-ni yuklab olish</a>
             {% else %}
             Yuklanmagan
             {% endif %}
         </p>
         <p><b>Фото:</b>
             {% if user.profile_picture %}
-            <img src="{{ user.profile_picture }}" width="100">
+            <img src="{{ user.profile_picture.url }}" width="100">
             {% else %}
             Rasm yo‘q
             {% endif %}
