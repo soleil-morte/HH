@@ -1,0 +1,62 @@
+{% load static %}
+{% load socialaccount %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Ishla</h1>
+            <nav>
+                <ul>
+                    <li><a href="/api/base/">Home</a></li>
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">LogOut</a></li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}">LogIn</a></li>
+                    <li><a href="{% url 'register' %}">Ro‘yxatdan o‘tish</a></li>
+                    {% endif %}
+
+                    <li><a href="{% url 'profile' %}">Profilni qorish</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="login-container">
+        <h2>Login qiling</h2>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username:</label>
+               {{form.username}}
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    {{ form.password }}
+                </div>
+
+                <button type="submit" class="btn">Kirish</button>
+        </form>
+
+        <div class="register-link">
+            <h4>Agar hisobingiz bo'lmasa, <a href="{% url 'register' %}">ro'yxatdan o'ting</a></h4>
+        </div>
+
+        <div class="oauth">
+            <p>yoki:</p>
+            <a href="{% provider_login_url 'google' %}" class="btn-google">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" width="20">
+                Google orqali kirish
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

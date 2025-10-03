@@ -1,0 +1,40 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Profil</title>
+    <link rel="stylesheet" href="{% static 'profile_update.css' %}">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Ishla</h1>
+            <nav>
+                <ul>
+                    <li><a href="/api/base/">Home</a></li>
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">LogOut</a></li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}">LogIn</a></li>
+                    <li><a href="{% url 'register' %}">Ro‘yxatdan o‘tish</a></li>
+                    {% endif %}
+
+                    <li><a href="{% url 'profile' %}">Profilni qorish</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <h2>✏️ Profilni yangilash</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Saqlash</button>
+    </form>
+</body>
+
+</html>

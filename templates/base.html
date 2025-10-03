@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ishla – Ish qidirish platformasi</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Ishla</h1>
+            <nav>
+                <ul>
+                    <li><a href="/api/base/">Home</a></li>
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">LogOut</a></li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}">LogIn</a></li>
+                    <li><a href="{% url 'register' %}">Ro‘yxatdan o‘tish</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'profile' %}">Profilni qorish</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Ish qidirmoqdamisiz?</h2>
+            <p>Eng so‘nggi vakansiyalarni toping yoki o‘zingiz uchun xodim yarating!</p>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Ishla. Barcha huquqlar himoyalangan.</p>
+    </footer>
+</body>
+
+</html>

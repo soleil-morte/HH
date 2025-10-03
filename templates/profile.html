@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Profil</title>
+    <link rel="stylesheet" href="{% static 'profile.css' %}">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Ishla</h1>
+            <nav>
+                <ul>
+                    <li><a href="/api/base/">Home</a></li>
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">LogOut</a></li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}">LogIn</a></li>
+                    <li><a href="{% url 'register' %}">Ro‘yxatdan o‘tish</a></li>
+                    {% endif %}
+
+                    <li><a href="{% url 'profile' %}">Profilni qorish</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <h2>👤 Foydalanuvchi profili</h2>
+
+    <div class="profile-info">
+        <p><b>FIO:</b> {{ user.full_name }}</p>
+        <p><b>Email:</b> {{ user.email }}</p>
+        <p><b>Telefon:</b> {{ user.phone }}</p>
+        <p><b>Rezyume :</b>
+            {% if user.cv %}
+            <a href="{{ user.cv.url }}">📄 CV-ni yuklab olish</a>
+            {% else %}
+            Yuklanmagan
+            {% endif %}
+        </p>
+        <p><b>Фото:</b>
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture }}" width="100">
+            {% else %}
+            Rasm yo‘q
+            {% endif %}
+        </p>
+    </div>
+    <div class="profile-actions">
+        <a href="{% url 'profile_update' %}" class="btn-save">Редактировать профиль</a>
+    </div>
+</body>
+
+</html>
