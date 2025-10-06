@@ -1,0 +1,115 @@
+/* Общий стиль */
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Заголовки */
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+/* Ссылки и кнопки */
+a, button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 5px 0;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+a {
+    background: #3498db;
+    color: #fff;
+}
+a:hover {
+    background: #2980b9;
+}
+
+button, .btn {
+    background: #4CAF50;
+    border: none;
+    color: #fff;
+}
+button:hover, .btn:hover {
+    background: #45a049;
+}
+
+.btn-danger {
+    background: #e74c3c;
+}
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+/* Список компаний */
+.company-list {
+    list-style: none;
+    padding: 0;
+}
+
+.company-list li {
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Карточка компании */
+.company-card {
+    text-align: center;
+}
+
+.company-card img {
+    max-width: 120px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+}
+
+/* Форма */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-weight: bold;
+    color: #555;
+}
+
+input, textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}

@@ -1,0 +1,27 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'companies.css' %}">
+  <title>Document</title>
+</head>
+
+<body>
+  <h2>{{ company.name }}</h2>
+
+  {% if company.logo %}
+  <img src="{{ company.logo.url }}" width="120"><br>
+  {% endif %}
+
+  <p>{{ company.description }}</p>
+
+  <a href="{% url 'company_edit' company.pk %}">✏️ Tahrirlash</a> |
+  <a href="{% url 'company_delete' company.pk %}" onclick="return confirm('Удалить компанию?');">🗑 O‘chirish</a> |
+  <a href="{% url 'company_list' %}">⬅ Qaytish</a>
+
+</body>
+
+</html>

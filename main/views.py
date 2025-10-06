@@ -1,13 +1,15 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from django.contrib.auth.forms import UserCreationForm
 from .forms import *
 from django.contrib.auth import authenticate,login,logout 
 from django.contrib.auth.decorators import login_required
-from rest_framework import serializers, status
+from rest_framework.permissions import IsAuthenticated 
+from rest_framework import serializers, status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+# from .serializers import CompanySerializer
+
 # Create your views here.
 def Base(request):
 
@@ -90,4 +92,54 @@ class PasswordChangeView(APIView):
         user.save()
 
         return Response({"detail": "Пароль успешно изменён"}, status=status.HTTP_200_OK) 
-    
+
+
+
+
+
+@login_required
+def company_list(request):
+    companies = Company.objects.filter(owner=request.user)
+    return render(request, 'companies/company_list.html', {'companies': companies})
+
+
+@login_required
+def company_detail(request, pk):
+    company = get_object_or_404(Company, pk=pk, owner=request.user)
+    return render(request, 'companies/company_detail.html', {'company': company})
+
+
+@login_required
+def company_create(request):
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, request.FILES)
+        if form.is_valid():
+            company = form.save(commit=False)
+            company.owner = request.user
+            company.save()
+            return redirect('company_list')
+    else:
+        form = CompanyForm()
+    return render(request, 'companies/company_form.html', {'form': form, 'title': 'Добавить компанию'})
+
+
+@login_required
+def company_edit(request, pk):
+    company = get_object_or_404(Company, pk=pk, owner=request.user)
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, request.FILES, instance=company)
+        if form.is_valid():
+            form.save()
+            return redirect('company_detail', pk=pk)
+    else:
+        form = CompanyForm(instance=company)
+    return render(request, 'companies/company_form.html', {'form': form, 'title': 'Редактировать компанию'})
+
+
+@login_required
+def company_delete(request, pk):
+    company = get_object_or_404(Company, pk=pk, owner=request.user)
+    company.delete()
+    return redirect('company_list')
+
+ 

@@ -70,3 +70,14 @@ class UserUpdateForm(forms.ModelForm):
             'cv': forms.FileInput(attrs={'class': 'form-control'}),
             'is_employer': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
+class CompanyForm(forms.ModelForm):
+    class Meta:
+        model = Company
+        fields = ['name', 'logo', 'description'] 
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Введите название компании'}),
+            'description': forms.Textarea(attrs={'class': 'form-control','placeholder': 'Краткое описание компании'}),
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
