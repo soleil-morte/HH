@@ -1,25 +1,35 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{% static 'companies.css' %}">
-  <title>Document</title>
+  <title>{{ company.name }}</title>
 </head>
 
 <body>
   <h2>{{ company.name }}</h2>
 
   {% if company.logo %}
-  <img src="{{ company.logo.url }}" width="120"><br>
+  <img src="{{ company.logo.url }}" width="120" alt="{{ company.name }} logotipi"><br>
   {% endif %}
 
   <p>{{ company.description }}</p>
 
-  <a href="{% url 'company_edit' company.pk %}">✏️ Tahrirlash</a> |
-  <a href="{% url 'company_delete' company.pk %}" onclick="return confirm('Удалить компанию?');">🗑 O‘chirish</a> |
+  {% if request.user.is_authenticated %}
+  {% if request.user.is_superuser %}
+  <a href="{% url 'company_edit' company.pk %}">✏️ Tahrirlash</a>
+  <a href="{% url 'company_delete' company.pk %}">🗑️ O‘chirish</a>
+  {% elif request.user.is_employer and company.owner == request.user %}
+  <a href="{% url 'company_edit' company.pk %}">✏️ Tahrirlash</a>
+  <a href="{% url 'company_delete' company.pk %}">🗑️ O‘chirish</a>
+  {% endif %}
+  {% endif %}
+
+
   <a href="{% url 'company_list' %}">⬅ Qaytish</a>
 
 </body>

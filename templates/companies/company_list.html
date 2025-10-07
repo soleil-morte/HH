@@ -1,12 +1,13 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{% static 'companies.css' %}">
-  <title>Document</title>
+  <title>Kompaniyalar ro‘yxati</title>
 </head>
 
 <body>
@@ -18,11 +19,16 @@
       <a href="{% url 'company_detail' company.pk %}">{{ company.name }}</a>
     </li>
     {% empty %}
-    <li>Kompaniyalar yoq</li>
+    <li>Kompaniyalar yo‘q</li>
     {% endfor %}
   </ul>
 
-  <a href="{% url 'company_create' %}">➕ Kompaniya qo‘shish</a>
+  {% if request.user.is_authenticated %}
+  {% if request.user.is_staff or request.user.is_superuser or request.user.is_employer %}
+  <a href="{% url 'company_create' %}" class="btn">➕ Kompaniya qo‘shish</a>
+  {% endif %}
+  {% endif %}
+
 </body>
 
 </html>

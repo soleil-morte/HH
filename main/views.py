@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers, status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.core.exceptions import PermissionDenied
 # from .serializers import CompanySerializer
 
 # Create your views here.
@@ -95,22 +96,21 @@ class PasswordChangeView(APIView):
 
 
 
-
-
-@login_required
 def company_list(request):
-    companies = Company.objects.filter(owner=request.user)
+    companies = Company.objects.all()  # Все видят все компании
     return render(request, 'companies/company_list.html', {'companies': companies})
 
 
-@login_required
 def company_detail(request, pk):
-    company = get_object_or_404(Company, pk=pk, owner=request.user)
+    company = get_object_or_404(Company, pk=pk)  # убрали owner=request.user
     return render(request, 'companies/company_detail.html', {'company': company})
 
 
 @login_required
 def company_create(request):
+    if not (request.user.is_employer or request.user.is_superuser):
+        raise PermissionDenied("Sizda kompaniya qo‘shish huquqi yo‘q.")
+
     if request.method == 'POST':
         form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
@@ -125,7 +125,12 @@ def company_create(request):
 
 @login_required
 def company_edit(request, pk):
-    company = get_object_or_404(Company, pk=pk, owner=request.user)
+    company = get_object_or_404(Company, pk=pk)
+
+    # проверка: админ или владелец-работодатель
+    if not (request.user.is_superuser or (request.user.is_employer and company.owner == request.user)):
+        raise PermissionDenied("Sizda bu kompaniyani tahrirlash huquqi yo‘q.")
+
     if request.method == 'POST':
         form = CompanyForm(request.POST, request.FILES, instance=company)
         if form.is_valid():
@@ -138,8 +143,14 @@ def company_edit(request, pk):
 
 @login_required
 def company_delete(request, pk):
-    company = get_object_or_404(Company, pk=pk, owner=request.user)
+    company = get_object_or_404(Company, pk=pk)
+
+    # проверка: админ или владелец-работодатель
+    if not (request.user.is_superuser or (request.user.is_employer and company.owner == request.user)):
+        raise PermissionDenied("Sizda bu kompaniyani o‘chirish huquqi yo‘q.")
+
     company.delete()
     return redirect('company_list')
+
 
  
