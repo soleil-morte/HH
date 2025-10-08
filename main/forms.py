@@ -81,3 +81,17 @@ class CompanyForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control','placeholder': 'Краткое описание компании'}),
             'logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+
+class JobForm(forms.ModelForm):
+    class Meta:
+        model = Job
+        fields = ['title', 'company', 'job_type', 'description', 'salary_min', 'salary_max', 'location']
+        widjets = {
+            'description': forms.Textarea(attrs={'class': 'form-control','placeholder': 'Краткое описание компании'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nomini kiriting'}),
+            'job_type': forms.BooleanField(attrs={'class': 'form-control'}),
+            'salary-min': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
+            'salary-max': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
+        }

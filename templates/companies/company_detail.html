@@ -28,7 +28,9 @@
   <a href="{% url 'company_delete' company.pk %}">🗑️ O‘chirish</a>
   {% endif %}
   {% endif %}
-
+  <!-- {{ request.user }}
+  {{ request.user.is_staff }}
+  {{ request.user.is_superuser }} -->
 
   <a href="{% url 'company_list' %}">⬅ Qaytish</a>
 

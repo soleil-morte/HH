@@ -47,7 +47,7 @@ def Login(request):
 
 def Logout(request):
     logout(request)
-    return redirect('/api/base/')
+    return redirect('/api/auth/login/')
 
 
 def profile_view(request):
@@ -151,6 +151,63 @@ def company_delete(request, pk):
 
     company.delete()
     return redirect('company_list')
+
+
+def job_list(request):
+    jobs = Job.objects.all()  
+    return render(request, 'companies/job_list.html', {'jobs': jobs})
+
+
+def job_detail(request, pk):
+    job = get_object_or_404(Job, pk=pk)  # убрали owner=request.user
+    return render(request, 'companies/job_detail.html', {'job': job})
+
+
+@login_required
+def job_create(request):
+    if not (request.user.is_employer or request.user.is_superuser):
+        raise PermissionDenied("Sizda kompaniya qo‘shish huquqi yo‘q.")
+
+    if request.method == 'POST':
+        form = JobForm(request.POST, request.FILES)
+        if form.is_valid():
+            company = form.save(commit=False)
+            company.owner = request.user
+            company.save()
+            return redirect('job_list')
+    else:
+        form = CompanyForm()
+    return render(request, 'companies/job_form.html', {'form': form, 'title': 'Добавить вакансию'})
+
+
+@login_required
+def job_edit(request, pk):
+    job = get_object_or_404(Job, pk=pk)
+
+    # проверка: админ или владелец-работодатель
+    if not (request.user.is_superuser or (request.user.is_employer and job.owner == request.user)):
+        raise PermissionDenied("Sizda bu kompaniyani tahrirlash huquqi yo‘q.")
+
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, request.FILES, instance=job)
+        if form.is_valid():
+            form.save()
+            return redirect('job_detail', pk=pk)
+    else:
+        form = CompanyForm(instance=job)
+    return render(request, 'companies/job_form.html', {'form': form, 'title': 'Редактировать вакансию'})
+
+
+@login_required
+def job_delete(request, pk):
+    job = get_object_or_404(Job, pk=pk)
+
+    # проверка: админ или владелец-работодатель
+    if not (request.user.is_superuser or (request.user.is_employer and job.owner == request.user)):
+        raise PermissionDenied("Sizda bu kompaniyani o‘chirish huquqi yo‘q.")
+
+    job.delete()
+    return redirect('job_list')
 
 
  
