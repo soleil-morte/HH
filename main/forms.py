@@ -5,6 +5,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm
 
 User = get_user_model()
 
@@ -14,7 +15,6 @@ class UserForm(forms.ModelForm):
         regex=r'^\+998\d{9}$',
         message="Telefon raqam +998xxxxxxx fromatida bo'lishi kerak."
     )
-
 
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Parol kamida 8 ta simvol'}),
@@ -38,7 +38,6 @@ class UserForm(forms.ModelForm):
             'is_employer': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('password1')
@@ -48,11 +47,19 @@ class UserForm(forms.ModelForm):
             if password1 != password2:
                 raise ValidationError("Parollar mos kelmadi.")
         return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])  
+        if commit:
+            user.save()
+        return user
     
 
-class LoginForm(forms.ModelForm):
+
+class LoginForm(AuthenticationForm):  
     username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Parol'})
@@ -87,12 +94,12 @@ class JobForm(forms.ModelForm):
     class Meta:
         model = Job
         fields = ['title', 'company', 'job_type', 'description', 'salary_min', 'salary_max', 'location']
-        widgets = {  # <-- исправлено
+        widgets = { 
             'description': forms.Textarea(attrs={'class': 'form-control','placeholder': 'Краткое описание компании'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nomini kiriting'}),
             'salary_min': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
             'salary_max': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
-            # 'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
+            
         }
     
     def __init__(self, *args, **kwargs):
@@ -109,3 +116,21 @@ class JobForm(forms.ModelForm):
                 self.fields['company'].initial = companies.first()
 
 
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['content', 'cv_file']
+        widgets = {
+            'content': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Введите сообщение...','id': 'message-input'}),
+            'cv_file': forms.FileInput(attrs={'class': 'form-control','id': 'cv-file','style': 'display: none;'})
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        content = cleaned_data.get('content')
+        cv_file = cleaned_data.get('cv_file')
+
+        if not content and not cv_file:
+            raise forms.ValidationError('Введите сообщение или прикрепите файл')
+        
+        return cleaned_data

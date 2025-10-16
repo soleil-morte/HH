@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView
 urlpatterns = [
     path('base/', Base),
     path('auth/register/', Register, name='register'),
-    path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/login/', Login, name='login'),
     path('logout/', Logout, name='logout'),
     path('profile/', profile_view, name='profile'),
     path('profile/update/', profile_update, name='profile_update'),
@@ -24,4 +24,7 @@ urlpatterns = [
     path('jobs/create/', job_create, name='job_create'),
     path('jobs/<int:pk>/edit/', job_edit, name='job_edit'),
     path('jobs/<int:pk>/delete/', job_delete, name='job_delete'),
+    
+    path('chats/', Chat_list, name='chat_list'),
+    path('chats/detail', Chat_detail, name='chat_detail'),
 ]

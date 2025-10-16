@@ -1,3 +1,4 @@
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from django.contrib.auth.forms import UserCreationForm
@@ -9,6 +10,7 @@ from rest_framework import serializers, status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.exceptions import PermissionDenied
+from django.contrib import messages
 # from .serializers import CompanySerializer
 
 # Create your views here.
@@ -35,15 +37,22 @@ def Register(request):
     return render(request, 'registration/register.html', context)
 
 
+
 def Login(request):
-    # if request.method == 'POST':
-    #     username = request.POST['username']
-    #     password = request.POST['password']
-    #     form = authenticate(request, username=username, password=password)
-    #     if form is not None:
-    #         login(request,form)
-    #         return redirect('/api/base/')
-        return render(request, 'registration/login.html')
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return redirect('/api/base/')
+        else:
+            # Добавляем сообщение об ошибке
+            messages.error(request, 'Неверное имя пользователя или пароль')
+            return render(request, 'registration/login.html', {'error': 'Неверные данные'})
+    
+    return render(request, 'registration/login.html')
 
 def Logout(request):
     logout(request)
@@ -103,6 +112,8 @@ def company_list(request):
 
 def company_detail(request, pk):
     company = get_object_or_404(Company, pk=pk)
+    
+    
     return render(request, 'companies/company_detail.html', {'company': company})
 
 
@@ -237,3 +248,13 @@ def job_delete(request, pk):
 
     job.delete()
     return redirect('job_list')
+
+
+def Chat_list(request):
+    chats = Chat.objects.all()
+    return render(request, 'chats/chat_list.html', {'chats': chats} )
+
+
+def Chat_detail(request, pk):
+    chats = get_object_or_404(Chat, pk=pk)
+    return render(request, 'chats/chat_detail.html', {'chats': chats})

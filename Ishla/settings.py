@@ -147,3 +147,12 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/api/base/'
 LOGOUT_REDIRECT_URL = '/api/base/'
+LOGIN_URL = '/api/auth/login/'
+
+# Настройки для allauth
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+# Настройки для логина

@@ -86,7 +86,7 @@ class Chat(models.Model):
     last_message = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.id
+        return f"Чат {self.id} - {self.user.username} и {self.company.name}"
     
 
 class Message(models.Model):
