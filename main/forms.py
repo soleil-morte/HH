@@ -87,11 +87,25 @@ class JobForm(forms.ModelForm):
     class Meta:
         model = Job
         fields = ['title', 'company', 'job_type', 'description', 'salary_min', 'salary_max', 'location']
-        widjets = {
+        widgets = {  # <-- исправлено
             'description': forms.Textarea(attrs={'class': 'form-control','placeholder': 'Краткое описание компании'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nomini kiriting'}),
-            'job_type': forms.BooleanField(attrs={'class': 'form-control'}),
-            'salary-min': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
-            'salary-max': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
-            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
+            'salary_min': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
+            'salary_max': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
+            # 'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': ''}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        user_companies = kwargs.pop('user_companies', None)
+        super().__init__(*args, **kwargs)
+
+        if user_companies is not None:
+            self.fields['company'].queryset = user_companies
+        elif user and not user.is_superuser:
+            companies = Company.objects.filter(owner=user)
+            self.fields['company'].queryset = companies
+            if companies.count() == 1:
+                self.fields['company'].initial = companies.first()
+
+

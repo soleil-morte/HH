@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'job.css' %}">
+  <title>{{ job.title }}</title>
+</head>
+
+<body>
+  <div class="container">
+    <h2>{{ job.title }}</h2>
+
+    <p><strong>Kompaniya:</strong> {{ job.company.name }}</p>
+    <p><strong>Tavsif:</strong> {{ job.description }}</p>
+    <p><strong>Maosh oralig‘i:</strong> {{ job.salary_min }} - {{ job.salary_max }}</p>
+    <p><strong>Ish turi:</strong> {{ job.get_job_type_display }}</p>
+    <p><strong>Joylashuv:</strong>
+      {% for loc in job.location.all %}
+        {{ loc.name }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </p>
+
+    <div class="buttons">
+      {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser or request.user.is_employer and job.company.owner == request.user %}
+          <a href="{% url 'job_edit' job.pk %}" class="btn btn-yellow">✏️ Tahrirlash</a>
+          <a href="{% url 'job_delete' job.pk %}" class="btn btn-red">🗑️ O‘chirish</a>
+        {% endif %}
+      {% endif %}
+      <a href="{% url 'job_list' %}" class="btn btn-gray">⬅ Qaytish</a>
+    </div>
+  </div>
+</body>
+</html>

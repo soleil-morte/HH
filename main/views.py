@@ -102,12 +102,13 @@ def company_list(request):
 
 
 def company_detail(request, pk):
-    company = get_object_or_404(Company, pk=pk)  # убрали owner=request.user
+    company = get_object_or_404(Company, pk=pk)
     return render(request, 'companies/company_detail.html', {'company': company})
 
 
 @login_required
 def company_create(request):
+    # Только для работодателей и админов
     if not (request.user.is_employer or request.user.is_superuser):
         raise PermissionDenied("Sizda kompaniya qo‘shish huquqi yo‘q.")
 
@@ -115,19 +116,23 @@ def company_create(request):
         form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
             company = form.save(commit=False)
-            company.owner = request.user
+            company.owner = request.user  # Привязываем владельца
             company.save()
             return redirect('company_list')
     else:
         form = CompanyForm()
-    return render(request, 'companies/company_form.html', {'form': form, 'title': 'Добавить компанию'})
+
+    return render(request, 'companies/company_form.html', {
+        'form': form,
+        'title': 'Kompaniya qo‘shish'
+    })
 
 
 @login_required
 def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)
 
-    # проверка: админ или владелец-работодатель
+    # Проверяем, что это владелец компании или админ
     if not (request.user.is_superuser or (request.user.is_employer and company.owner == request.user)):
         raise PermissionDenied("Sizda bu kompaniyani tahrirlash huquqi yo‘q.")
 
@@ -138,14 +143,18 @@ def company_edit(request, pk):
             return redirect('company_detail', pk=pk)
     else:
         form = CompanyForm(instance=company)
-    return render(request, 'companies/company_form.html', {'form': form, 'title': 'Редактировать компанию'})
+
+    return render(request, 'companies/company_form.html', {
+        'form': form,
+        'title': 'Kompaniyani tahrirlash'
+    })
 
 
 @login_required
 def company_delete(request, pk):
     company = get_object_or_404(Company, pk=pk)
 
-    # проверка: админ или владелец-работодатель
+    # Только владелец компании или админ может удалить
     if not (request.user.is_superuser or (request.user.is_employer and company.owner == request.user)):
         raise PermissionDenied("Sizda bu kompaniyani o‘chirish huquqi yo‘q.")
 
@@ -155,59 +164,76 @@ def company_delete(request, pk):
 
 def job_list(request):
     jobs = Job.objects.all()  
-    return render(request, 'companies/job_list.html', {'jobs': jobs})
+    return render(request, 'jobs/job_list.html', {'jobs': jobs})
 
 
 def job_detail(request, pk):
-    job = get_object_or_404(Job, pk=pk)  # убрали owner=request.user
-    return render(request, 'companies/job_detail.html', {'job': job})
+    job = get_object_or_404(Job, pk=pk)
+    return render(request, 'jobs/job_detail.html', {'job': job})
 
 
 @login_required
 def job_create(request):
+    # Только работодатели и админы
     if not (request.user.is_employer or request.user.is_superuser):
-        raise PermissionDenied("Sizda kompaniya qo‘shish huquqi yo‘q.")
+        raise PermissionDenied("Sizda ish e’loni qo‘shish huquqi yo‘q.")
 
-    if request.method == 'POST':
-        form = JobForm(request.POST, request.FILES)
-        if form.is_valid():
-            company = form.save(commit=False)
-            company.owner = request.user
-            company.save()
-            return redirect('job_list')
+    if request.user.is_superuser:
+        # Админ может выбрать любую компанию
+        form = JobForm(request.POST or None, request.FILES or None)
     else:
-        form = CompanyForm()
-    return render(request, 'companies/job_form.html', {'form': form, 'title': 'Добавить вакансию'})
+        # Получаем все компании пользователя
+        companies = Company.objects.filter(owner=request.user)
+        if not companies.exists():
+            raise PermissionDenied("Sizda faol kompaniya yo‘q, shuning uchun ish e’loni yarata olmaysiz.")
+        
+        # Ограничиваем форму только его компаниями
+        form = JobForm(request.POST or None, request.FILES or None, user_companies=companies)
+
+    if request.method == 'POST' and form.is_valid():
+        job = form.save(commit=False)
+
+        if not request.user.is_superuser:
+            # Обычный работодатель — выбираем компанию из формы
+            job.company = form.cleaned_data['company']
+
+        job.save()
+        form.save_m2m()
+        return redirect('job_list')
+
+    return render(request, 'jobs/job_form.html', {
+        'form': form,
+        'title': 'Ish e’loni qo‘shish'
+    })
+
 
 
 @login_required
 def job_edit(request, pk):
     job = get_object_or_404(Job, pk=pk)
 
-    # проверка: админ или владелец-работодатель
-    if not (request.user.is_superuser or (request.user.is_employer and job.owner == request.user)):
-        raise PermissionDenied("Sizda bu kompaniyani tahrirlash huquqi yo‘q.")
+    # Проверка: админ или владелец компании через которую создана вакансия
+    if not (request.user.is_superuser or (request.user.is_employer and job.company.owner == request.user)):
+        raise PermissionDenied("Sizda bu vakansiyani tahrirlash huquqi yo'q.")
 
     if request.method == 'POST':
-        form = CompanyForm(request.POST, request.FILES, instance=job)
+        form = JobForm(request.POST, instance=job, user=request.user)
         if form.is_valid():
             form.save()
             return redirect('job_detail', pk=pk)
     else:
-        form = CompanyForm(instance=job)
-    return render(request, 'companies/job_form.html', {'form': form, 'title': 'Редактировать вакансию'})
+        form = JobForm(instance=job, user=request.user)
+    
+    return render(request, 'jobs/job_form.html', {'form': form, 'title': 'Редактировать вакансию'})
 
 
 @login_required
 def job_delete(request, pk):
     job = get_object_or_404(Job, pk=pk)
 
-    # проверка: админ или владелец-работодатель
-    if not (request.user.is_superuser or (request.user.is_employer and job.owner == request.user)):
-        raise PermissionDenied("Sizda bu kompaniyani o‘chirish huquqi yo‘q.")
+    # Проверка: админ или владелец компании
+    if not (request.user.is_superuser or (request.user.is_employer and job.company.owner == request.user)):
+        raise PermissionDenied("Sizda bu vakansiyani o'chirish huquqi yo'q.")
 
     job.delete()
     return redirect('job_list')
-
-
- 

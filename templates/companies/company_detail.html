@@ -32,6 +32,16 @@
   {{ request.user.is_staff }}
   {{ request.user.is_superuser }} -->
 
+  <h3>Вакансии компании:</h3>
+  {% for job in company.job_set.all %}
+  <div class="job-item">
+    <h4>{{ job.title }}</h4>
+    <p>{{ job.job_type }} | {{ job.salary_min }} - {{ job.salary_max }}</p>
+  </div>
+  {% empty %}
+  <p>Вакансий пока нет</p>
+  {% endfor %}
+
   <a href="{% url 'company_list' %}">⬅ Qaytish</a>
 
 </body>
