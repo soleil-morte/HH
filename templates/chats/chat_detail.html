@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'chat.css' %}">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Чат с {{ chats.company.name }}</h2>
+            <p class="chat-partner">Пользователь: {{ chats.user.username }}</p>
+        </div>
+
+        <div class="chat-messages">
+            {% for message in chats.message_set.all %}
+            <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                <div class="message-content">
+                    <p>{{ message.content }}</p>
+                    {% if message.cv_file %}
+                    <a href="{{ message.cv_file.url }}" class="cv-link">📎 Резюме</a>
+                    {% endif %}
+                    <span class="timestamp">{{ message.timestamp|date:"d.m.Y H:i" }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-messages">Пока нет сообщений</p>
+            {% endfor %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="chat-form">
+            {% csrf_token %}
+            <input type="text" name="content" placeholder="Введите сообщение..." required>
+            <input type="file" name="cv_file" accept=".pdf,.doc,.docx">
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+
+</body>
+
+</html>

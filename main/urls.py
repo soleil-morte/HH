@@ -26,5 +26,5 @@ urlpatterns = [
     path('jobs/<int:pk>/delete/', job_delete, name='job_delete'),
     
     path('chats/', Chat_list, name='chat_list'),
-    path('chats/detail', Chat_detail, name='chat_detail'),
+    path('<int:pk>/', Chat_detail, name='chat_detail'),
 ]
