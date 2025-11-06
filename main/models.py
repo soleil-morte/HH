@@ -93,7 +93,7 @@ class Message(models.Model):
     content = models.CharField(max_length=120)
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
-    cv_file = models.FileField(upload_to="chat_cvs/", blank=True, null=True)
+    cv_file = models.FileField(upload_to="cvs/", blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 

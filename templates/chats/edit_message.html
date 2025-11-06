@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'chat.css' %}">
+    <title>Document</title>
+</head>
+<body>
+
+<div class="edit-container">
+    <h2>Редактировать сообщение</h2>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" required>{{ message.content }}</textarea>
+        <button type="submit">Сохранить</button>
+        <a href="{% url 'chat_detail' pk=message.chat.pk %}">Отмена</a>
+    </form>
+</div>
+
+</body>
+</html>

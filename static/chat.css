@@ -97,3 +97,20 @@
     text-align: center;
     color: #888;
 }
+
+.message-actions {
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message-actions a {
+    color: #999;
+    margin-left: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.message-actions a:hover {
+    color: #333;
+}
+

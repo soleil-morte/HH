@@ -256,5 +256,36 @@ def Chat_list(request):
 
 
 def Chat_detail(request, pk):
-    chats = get_object_or_404(Chat, pk=pk)
-    return render(request, 'chats/chat_detail.html', {'chats': chats})
+    chat = get_object_or_404(Chat, pk=pk)
+
+    if request.method == "POST":
+        Message.objects.create(
+            chat=chat,
+            sender=request.user,
+            content=request.POST.get("content"),
+            cv_file=request.FILES.get("cv_file")
+        )
+        return redirect("chat_detail", pk=chat.pk)
+
+    return render(request, "chats/chat_detail.html", {"chats": chat})
+
+def edit_message(request, pk):
+    message = get_object_or_404(Message, pk=pk)
+    if request.user != message.sender:
+        return redirect('chat_detail', pk=message.chat.pk)
+
+    if request.method == "POST":
+        message.content = request.POST.get("content")
+        message.save()
+        return redirect("chat_detail", pk=message.chat.pk)
+
+    return render(request, "chats/edit_message.html", {"message": message})
+
+
+def delete_message(request, pk):
+    message = get_object_or_404(Message, pk=pk)
+    if request.user == message.sender:
+        chat_pk = message.chat.pk
+        message.delete()
+        return redirect("chat_detail", pk=chat_pk)
+    return redirect("chat_detail", pk=message.chat.pk)

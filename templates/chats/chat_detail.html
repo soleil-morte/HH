@@ -25,6 +25,13 @@
                     <a href="{{ message.cv_file.url }}" class="cv-link">📎 Резюме</a>
                     {% endif %}
                     <span class="timestamp">{{ message.timestamp|date:"d.m.Y H:i" }}</span>
+
+                    {% if message.sender == request.user %}
+                    <div class="message-actions">
+                        <a href="{% url 'edit_message' pk=message.pk %}" class="edit-link">✏️</a>
+                        <a href="{% url 'delete_message' pk=message.pk %}" class="delete-link">🗑️</a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% empty %}
@@ -35,10 +42,11 @@
         <form method="post" enctype="multipart/form-data" class="chat-form">
             {% csrf_token %}
             <input type="text" name="content" placeholder="Введите сообщение..." required>
-            <input type="file" name="cv_file" accept=".pdf,.doc,.docx">
+            <input type="file" name="cv_file">
             <button type="submit">Отправить</button>
         </form>
     </div>
+     {{ request.user.username }}
 
 </body>
 
